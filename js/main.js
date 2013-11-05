@@ -52,7 +52,7 @@ api = (function () {
     return {
         // Gets event list
         get_events: function () {
-            return doRequest("GET", "json", "/api/rfid/events/", "?api_key=" + API_KEY + "&event_end__gte=" + "2013-10-30" + "&limit=3", {}, events.events_callback);
+            return doRequest("GET", "json", "/api/rfid/events/", "?api_key=" + API_KEY + "&event_end__gte=" + tools.today() + "&limit=3", {}, events.events_callback);
         },
 
         // Gets user object by username
