@@ -2,7 +2,7 @@
 
 var events, tools, api;
 var API_KEY = "5db1fee4b5703808c48078a76768b155b421b210c0761cd6a5d223f4d99f1eaa";
-var API_BASE_URL = "http://moonshine.online.ntnu.no"
+var API_BASE_URL = "http://moonshine.online.ntnu.no";
 var debug = true;
 
 // API module, has a private doRequest method, and public get and set methods
@@ -120,6 +120,14 @@ events = (function () {
         if (debug) console.log(data);
         if (data.meta.total_count > 0) {
             event_list = data.events;
+            
+            // Remove events that are not attendance events
+            for (var x = 0; x < event_list.length; x++) {
+                if (event_list[x].attendance_event == null) {
+                    event_list.splice(x, 1);
+                    x--;
+                }
+            }
             tools.populate_nav(event_list);
             events.set_active_event(0);
         }
