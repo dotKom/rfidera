@@ -2,6 +2,7 @@
 
 var events, tools, api;
 var API_KEY = "5db1fee4b5703808c48078a76768b155b421b210c0761cd6a5d223f4d99f1eaa";
+var API_BASE_URL = "http://moonshine.online.ntnu.no"
 var debug = true;
 
 // API module, has a private doRequest method, and public get and set methods
@@ -33,7 +34,7 @@ api = (function () {
             dataType: dataType,
             contentType: "application/json",
             data: send_data,
-            url: url + params,
+            url: API_BASE_URL + url + params,
             success: function (return_data) {
                 if (debug) console.log(return_data);
                 callback(return_data);
@@ -52,7 +53,7 @@ api = (function () {
     return {
         // Gets event list
         get_events: function () {
-            return doRequest("GET", "json", "/api/rfid/events/", "?api_key=" + API_KEY + "&event_end__gte=" + tools.today() + "&limit=3", {}, events.events_callback);
+            return doRequest("GET", "json", "/api/rfid/events/", "?api_key=" + API_KEY + "&event_end__gte=" + tools.today() + "&order_by=event_start&limit=4", {}, events.events_callback);
         },
 
         // Gets user object by username
@@ -280,6 +281,11 @@ tools = (function () {
             $('#topmessage').removeClass().addClass("alert alert-danger").html(message + '<div class="pull-right">' + tools.now() + '</div>');
         },
 
+        // Show a warning message on the top of the page...
+        showwarning: function (status, message) {
+            $('#topmessage').removeClass().addClass("alert alert-warning").html(message + '<div class="pull-right">' + tools.now() + '</div>');
+        },
+
         // Show a success message on the top of the page...
         showsuccess: function (status, message) {
             $('#topmessage').removeClass().addClass("alert alert-success").html(message + '<div class="pull-right">' + tools.now() + '</div>');
@@ -338,7 +344,7 @@ tools = (function () {
                 }
             };
             list.html(data);
-            $('#total_attendees').text('Antall oppmøtte: ' + attended + '/' + events.get_active_event().attendance_event.max_capacity);
+            $('#total_attendees').html('Antall oppmøtte: ' + attended + '/' + attendees.length+ " &ndash; Totalt " + events.get_active_event().attendance_event.max_capacity + " plasser.");
         },
 
         // Get user by RFID
@@ -390,16 +396,22 @@ tools = (function () {
                     }
                     else {
                         tools.showerror(400, "Brukeren er allerede registrert!");
+                        last_rfid = null;
                     }
                 }
                 else {
-                    tools.showerror(401, "Brukeren er ikke påmeldt arrangementet, eller er på venteliste");
+                    tools.showwarning(401, "Brukeren er ikke påmeldt arrangementet, eller er på venteliste");
                 }
             }
             else {
                 var msg = "Brukeren eksisterer ikke i databasen.";
-                if (last_rfid != null) msg += " Skriv inn et brukernavn for å knytte RFID'en til brukeren og sjekk inn.";
-                tools.showerror(404, msg);
+                if (last_rfid != null) {
+                    msg += " Skriv inn et brukernavn for å knytte RFID'en til brukeren og sjekk inn.";
+                    tools.showwarning(404, msg);
+                }
+                else {
+                    tools.showerror(404, msg);
+                }
                 events.set_active_user(null);
             }
         },
@@ -430,6 +442,9 @@ tools = (function () {
 // On page load complete, do this stuff...
 $(document).ready(function () {
 
+    // Active nav pane indicator variable
+    var previous_event = null;
+
     // Get the event list from the API
     events.get_event_list();
 
@@ -439,7 +454,10 @@ $(document).ready(function () {
     // Bind click listeners to the events menu links
     $('#nav').on('click', 'a', function (event) {
         event.preventDefault();
+        if (previous_event != null) previous_event.removeClass();
         events.set_active_event($(this).attr("id"));
+        previous_event = $(this).parent();
+        previous_event.addClass('active');
     });
 
     // Enter key binding in the input field
@@ -447,6 +465,7 @@ $(document).ready(function () {
         if (key.which === 13) {
             var input = $('#input').val();
             tools.parse_input(input);
+            tools.showwarning(200, "Sender forespørsel...");
         }
     });
 

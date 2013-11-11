@@ -1,12 +1,14 @@
 @blue: #004b80;
-@orange: #ee7810;
+@orange: #FF8C00;
+@red: #b22222;
+@green: #008000;
 @white: #efefef;
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400,600);
 
 body {
     background-image: url("../img/splash_bg.jpg");
     background-repeat: repeat;
-    background-position: center;
+    background-position: fixed center;
     color: @white;
     font-family: 'Open Sans', sans-serif;
 }
@@ -54,4 +56,19 @@ p {
 
 th {
     background-color: @blue;
+}
+
+.alert-danger {
+    background-color: @red;
+    color: @white;
+}
+
+.alert-success {
+    background-color: @green;
+    color: @white;
+}
+
+.alert-warning {
+    background-color: @orange;
+    color: @white;
 }
