@@ -1,9 +1,9 @@
 /* MODULES */
 
 var events, tools, api;
-var API_KEY = "5db1fee4b5703808c48078a76768b155b421b210c0761cd6a5d223f4d99f1eaa";
-var API_BASE_URL = "http://moonshine.online.ntnu.no";
-var debug = true;
+var API_KEY = "00bf159305835dff34cef37c6a3b68bd3381c559d43bab3cfa064039201afe9a";
+var API_BASE_URL = "http://dotkom:sleggapow@moonshine.online.ntnu.no";
+var debug = false;
 
 // API module, has a private doRequest method, and public get and set methods
 api = (function () {
@@ -130,6 +130,8 @@ events = (function () {
             }
             tools.populate_nav(event_list);
             events.set_active_event(0);
+
+            tools.showsuccess(200, "Systemet er klart til bruk!");
         }
         else {
             if (debug) console.log("No events returned from query...");
@@ -176,6 +178,7 @@ events = (function () {
                 tools.showsuccess(200, "Systemet er klart til bruk!");
             }
             tools.reset_last_rfid();
+            if (debug) console.log("Set active event: " + index);
         },
 
         // Updates the active event with new data from the API
@@ -522,7 +525,7 @@ $(document).ready(function () {
     events.get_event_list();
 
     // Initiate the top message box!
-    $('#topmessage').removeClass().addClass("alert alert-success").html('Systemet er klart til bruk!<div class="pull-right">' + tools.now() + '</div>').fadeIn(200);
+    $('#topmessage').removeClass().addClass("alert alert-warning").html('Laster arrangementsinformasjon...<div class="pull-right">' + tools.now() + '</div>').fadeIn(200);
 
     // Bind click listeners to the events menu links
     $('#nav').on('click', 'a', function (event) {
