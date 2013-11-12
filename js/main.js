@@ -1,9 +1,9 @@
 /* MODULES */
 
 var events, tools, api;
-var API_KEY = "00bf159305835dff34cef37c6a3b68bd3381c559d43bab3cfa064039201afe9a";
-var API_BASE_URL = "http://dotkom:sleggapow@moonshine.online.ntnu.no";
-var debug = false;
+var API_KEY = "5db1fee4b5703808c48078a76768b155b421b210c0761cd6a5d223f4d99f1eaa";
+var API_BASE_URL = "http://moonshine.online.ntnu.no";
+var debug = true;
 
 // API module, has a private doRequest method, and public get and set methods
 api = (function () {
