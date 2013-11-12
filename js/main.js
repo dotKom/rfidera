@@ -340,19 +340,57 @@ tools = (function () {
         // This method takes in an array of attendees and lists those whose attended flag is set to true,
         // as well as keeping track of the total amount of attendees.
         populate_attendance_list: function (attendees) {
-            var attended = 0;
+            var ev = events.get_active_event();
             var list = $('#attendees');
-            var data = '';
-            list.empty();
-            data += '<tr><th>Nr</th><th>Fornavn</th><th>Etternavn</th></tr>\n';
+            var registered = [];
+            var unregistered = [];
+            var waitlisted = [];
+            var tabledata = '';
+
+            // Sorting function for attendee array by firstname
+            var sort_by_name = function(a, b) {
+                var first = a.first_name.toLowerCase();
+                var second = b.first_name.toLowerCase();
+                if (first < second) return -1;
+                else if (first > second) return 1;
+                else return 0;
+            };
+
+            // Seperate the boys from the men (split into registered, unregistered and waitlisted)
             for (var x = 0; x < attendees.length; x++) {
                 if (attendees[x].attended) {
-                    attended++;
-                    data += '<tr><td>' + (attended) + '</td><td>' + attendees[x].user.first_name + '</td><td>' + attendees[x].user.last_name + '</td></tr>\n';
+                    registered.push(attendees[x].user);
+                }
+                else if (ev.attendance_event.waitlist && (x+1) > ev.attendance_event.max_capacity) {
+                    waitlisted.push(attendees[x].user);
+                }
+                else {
+                    unregistered.push(attendees[x].user);
                 }
             };
-            list.html(data);
-            $('#total_attendees').html('Antall oppmøtte: ' + attended + '/' + attendees.length+ " &ndash; Totalt " + events.get_active_event().attendance_event.max_capacity + " plasser.");
+
+            console.log(registered);
+
+            // Sort the lists alfabetically
+            registered.sort(sort_by_name);
+            unregistered.sort(sort_by_name);
+            waitlisted.sort(sort_by_name);
+
+            // Build the list
+            tabledata += '<tr><th>Navn</th><th>Møtt</th></tr>';
+            $(registered).each(function (i) {
+                tabledata += '<tr><td>' + registered[i].first_name + ' ' + registered[i].last_name + '</td><td><span class="label label-success">JA</span></td></tr>';
+            });
+            $(unregistered).each(function (i) {
+                tabledata += '<tr><td>' + unregistered[i].first_name + ' ' + unregistered[i].last_name + '</td><td><span class="label label-danger">NEI</span></td></tr>';
+            });
+            $(waitlisted).each(function (i) {
+                tabledata += '<tr><td>' + waitlisted[i].first_name + ' ' + waitlisted[i].last_name + '</td><td><span class="label label-warning">VENTELISTE</span></td></tr>';
+            });
+            list.html(tabledata);
+
+            // Update stats
+            $('#total_attendees').html('Møtt: ' + registered.length + ' &ndash; Påmeldte: ' + attendees.length+ ' &ndash; Plasser: ' + ev.attendance_event.max_capacity);
         },
 
         // Get user by RFID
