@@ -249,6 +249,16 @@ events = (function () {
             }
             return false;
         },
+
+        is_waitlisted: function (attendee) {
+            var i = active_event.attendance_event.users.indexOf(attendee);
+            if (i != -1) {
+                if (i > active_event.attendance_event.max_capacity - 1) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }());
 
@@ -334,6 +344,9 @@ tools = (function () {
         populate_nav: function (event_list) {
             $(event_list).each(function (id) {
                 $('#nav').append($('<li><a href="#" id="' + id + '">' + event_list[id].title + '</a></li>'));
+                if (id == 0) {
+                    $('#nav li a').click();
+                }    
             });
         },
 
@@ -369,23 +382,23 @@ tools = (function () {
                 }
             };
 
-            console.log(registered);
-
             // Sort the lists alfabetically
             registered.sort(sort_by_name);
             unregistered.sort(sort_by_name);
             waitlisted.sort(sort_by_name);
 
             // Build the list
-            tabledata += '<tr><th>Navn</th><th>Møtt</th></tr>';
+            tabledata += '<tr><th>Møtt</th></tr>';
             $(registered).each(function (i) {
-                tabledata += '<tr><td>' + registered[i].first_name + ' ' + registered[i].last_name + '</td><td><span class="label label-success">JA</span></td></tr>';
+                tabledata += '<tr><td>' + registered[i].first_name + ' ' + registered[i].last_name + '</td></tr>';
             });
+            tabledata += '<tr><th>Ikke møtt</th></tr>';
             $(unregistered).each(function (i) {
-                tabledata += '<tr><td>' + unregistered[i].first_name + ' ' + unregistered[i].last_name + '</td><td><span class="label label-danger">NEI</span></td></tr>';
+                tabledata += '<tr><td>' + unregistered[i].first_name + ' ' + unregistered[i].last_name + '</td></tr>';
             });
+            tabledata += '<tr><th>Venteliste</th></tr>';
             $(waitlisted).each(function (i) {
-                tabledata += '<tr><td>' + waitlisted[i].first_name + ' ' + waitlisted[i].last_name + '</td><td><span class="label label-warning">VENTELISTE</span></td></tr>';
+                tabledata += '<tr><td>' + waitlisted[i].first_name + ' ' + waitlisted[i].last_name + '</td></tr>';
             });
             list.html(tabledata);
 
@@ -433,7 +446,21 @@ tools = (function () {
                 if (e) {
                     console.log("Attendee is in list and attendee object returned");
                     if (!events.is_already_signed_up(e)) {
-                        events.register_attendant(e);
+                        
+                        // Checks if user is waitlisted
+                        if (events.is_waitlisted(e)) {
+                            if (confirm(e.user.first_name + ' ' + e.user.last_name + ' er på venteliste. Registrere allikevel?')) {
+                                events.register_attendant(e);
+                            }
+                            else {
+                                last_rfid = null;
+                                tools.showerror(401, "Brukeren ble ikke registrert!");
+                            }
+                            $('#input').focus();
+                        }
+                        else {
+                            events.register_attendant(e);
+                        }
 
                         // Update the user object with the RFID number if an active RFID is in processing
                         if (last_rfid != null) {
