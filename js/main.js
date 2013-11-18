@@ -117,7 +117,7 @@ events = (function () {
 
     // Private method that parses the returned events object and checks if there are any
     var extract_events = function (data) {
-        if (debug) console.log(data);
+        if (debug) console.log("Returned events list: " + data);
         if (data.meta.total_count > 0) {
             event_list = data.events;
             
@@ -146,6 +146,7 @@ events = (function () {
     return {
         // Gets the event list from the API
         get_event_list: function () {
+            if (debug) console.log("Fetching event list...");
             api.get_events();
         },
         
