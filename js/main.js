@@ -128,10 +128,13 @@ events = (function () {
                     x--;
                 }
             }
-            tools.populate_nav(event_list);
-            events.set_active_event(0);
-
-            tools.showsuccess(200, "Systemet er klart til bruk!");
+            if (event_list.length > 0) {
+                tools.populate_nav(event_list);
+                events.set_active_event(0);
+                tools.showsuccess(200, "Systemet er klart til bruk!");
+            else {
+                tools.showerror(404, "Det er ingen pågående eller fremtidige arrangement.");   
+            }
         }
         else {
             if (debug) console.log("No events returned from query...");
