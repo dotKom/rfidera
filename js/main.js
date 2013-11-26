@@ -482,7 +482,7 @@ tools = (function () {
                     }
                 }
                 else {
-                    tools.showwarning(401, "Brukeren er ikke påmeldt arrangementet, eller er på venteliste");
+                    tools.showwarning(401, "Brukeren er ikke påmeldt arrangementet. Han/hun må legges til manuelt i administrasjonspanelet.");
                 }
             }
             else {
