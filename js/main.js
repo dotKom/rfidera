@@ -2,7 +2,7 @@
 
 var events, tools, api;
 var API_KEY = "5db1fee4b5703808c48078a76768b155b421b210c0761cd6a5d223f4d99f1eaa";
-var API_BASE_URL = "https://online.ntnu.no:8002";
+var API_BASE_URL = "https://localhost:8000";
 var debug = true;
 
 // API module, has a private doRequest method, and public get and set methods
@@ -394,7 +394,6 @@ tools = (function () {
             // Sort the lists alfabetically
             registered.sort(sort_by_name);
             unregistered.sort(sort_by_name);
-            waitlisted.sort(sort_by_name);
 
             // Build the list
             tabledata += '<tr><th>Møtt</th></tr>';
@@ -407,7 +406,7 @@ tools = (function () {
             });
             tabledata += '<tr><th>Venteliste</th></tr>';
             $(waitlisted).each(function (i) {
-                tabledata += '<tr><td>' + waitlisted[i].first_name + ' ' + waitlisted[i].last_name + '</td></tr>';
+                tabledata += '<tr><td>' + (i + 1) + ' ' + waitlisted[i].first_name + ' ' + waitlisted[i].last_name + '</td></tr>';
             });
             list.html(tabledata);
 
