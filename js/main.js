@@ -406,7 +406,7 @@ tools = (function () {
             });
             tabledata += '<tr><th>Venteliste</th></tr>';
             $(waitlisted).each(function (i) {
-                tabledata += '<tr><td>' + (i + 1) + ' ' + waitlisted[i].first_name + ' ' + waitlisted[i].last_name + '</td></tr>';
+                tabledata += '<tr><td>' + (i + 1) + '. ' + waitlisted[i].first_name + ' ' + waitlisted[i].last_name + '</td></tr>';
             });
             list.html(tabledata);
 
