@@ -501,11 +501,13 @@ tools = (function () {
             else {
                 var msg = "";
                 if (last_rfid != null) {
-                    if (last_rfid_first_try)
+                    if (last_rfid_first_try) {
                         msg += "Kortet finnes ikke i databasen. Skriv inn et brukernavn for å knytte kortet til brukeren og sjekk inn.";
                         last_rfid_first_try = false;
-                    else
+                    }
+                    else {
                         msg += "Brukernavn finnes ikke. Husk at det er brukernavn på Onlineweb! (RFID er fortsatt aktiv, prøv igjen.)";
+                    }
                     tools.showwarning(404, msg);
                 }
                 else {
