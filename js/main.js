@@ -225,6 +225,7 @@ events = (function () {
                 tools.showsuccess(200, events.get_active_user().first_name + " " + events.get_active_user().last_name + " er registrert som deltaker. Velkommen!");
                 events.set_active_user(null);
                 events.update_active_event();
+                tools.reset_rfid_first_try();
             }
             else {
                 tools.showerror(400, "Det oppstod en uventet feil under registering av deltakeren.");
@@ -294,13 +295,17 @@ tools = (function () {
     - get_user_by_username
     - reset_last_rfid
     - is_there_active_rfid
+    - reset_rfid_first_try
     - user_callback
     - patch_user_callback
     - parse_input
 
     */
 
+    // Keeps the last RFID entry in cache
     var last_rfid = null;
+    // States if its the first try to connect a new RFID to a user-object.
+    var last_rfid_first_try = true;
 
     return {
         // Show an error message on the top of the page...
@@ -418,6 +423,7 @@ tools = (function () {
         get_user_by_rfid: function (rfid) {
             if (debug) console.log("Getting user by rfid: " + rfid);
             last_rfid = rfid;
+            last_rfid_first_try = true;
             api.get_user_by_rfid(rfid);
         },
 
@@ -427,10 +433,12 @@ tools = (function () {
             api.get_user_by_username(username);
         },
 
+        // Resets RFID cache
         reset_last_rfid: function () {
             last_rfid = null;
         },
 
+        // Returns true if there is an active RFID in cache
         is_there_active_rfid: function () {
             if (last_rfid != null) {
                 return true;
@@ -438,6 +446,12 @@ tools = (function () {
             else {
                 return false;
             }
+        },
+
+        // Resets the state for RFID to User mapping.
+        // If last_rfid_first_try is false, a more detailed msg is displayed to help user
+        reset_rfid_first_try: function () {
+            last_rfid_first_try = true;
         },
 
         // Public callback for User queries
@@ -487,7 +501,11 @@ tools = (function () {
             else {
                 var msg = "";
                 if (last_rfid != null) {
-                    msg += "Kortet finnes ikke i databasen. Skriv inn et brukernavn for å knytte kortet til brukeren og sjekk inn.";
+                    if (last_rfid_first_try)
+                        msg += "Kortet finnes ikke i databasen. Skriv inn et brukernavn for å knytte kortet til brukeren og sjekk inn.";
+                        last_rfid_first_try = false;
+                    else
+                        msg += "Brukernavn finnes ikke. Husk at det er brukernavn på Onlineweb! (RFID er fortsatt aktiv, prøv igjen.)";
                     tools.showwarning(404, msg);
                 }
                 else {
