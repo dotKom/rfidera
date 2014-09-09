@@ -485,12 +485,13 @@ tools = (function () {
                 }
             }
             else {
-                var msg = "Brukeren eksisterer ikke i databasen.";
+                var msg = "";
                 if (last_rfid != null) {
-                    msg += " Skriv inn et brukernavn for å knytte RFID'en til brukeren og sjekk inn.";
+                    msg += "Kortet finnes ikke i databasen. Skriv inn et brukernavn for å knytte kortet til brukeren og sjekk inn.";
                     tools.showwarning(404, msg);
                 }
                 else {
+                    msg += "Brukeren finnes ikke i databasen.";
                     tools.showerror(404, msg);
                 }
                 events.set_active_user(null);
