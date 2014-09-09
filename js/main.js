@@ -506,7 +506,7 @@ tools = (function () {
                         last_rfid_first_try = false;
                     }
                     else {
-                        msg += "Brukernavn finnes ikke. Husk at det er brukernavn på Onlineweb! (RFID er fortsatt aktiv, prøv igjen.)";
+                        msg += "Brukernavn finnes ikke. Husk at det er brukernavn på Onlineweb! (Prøv igjen, eller scan nytt kort for å avbryte.)";
                     }
                     tools.showwarning(404, msg);
                 }
