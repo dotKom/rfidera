@@ -507,7 +507,7 @@ tools = (function () {
         // Parse text input for RFID or username
         parse_input: function (input) {
             if (debug) console.log("Parsing input...");
-            if (/^[0-9]{10}$/.test(input)) {
+            if (/^[0-9]{8,20}$/.test(input)) {
                 if (debug) console.log("Rfid valid");
                 tools.get_user_by_rfid(input);
             }
