@@ -1,9 +1,9 @@
 /* MODULES */
 
 var events, tools, api;
-var API_KEY = "5db1fee4b5703808c48078a76768b155b421b210c0761cd6a5d223f4d99f1eaa";
-var API_BASE_URL = "https://localhost:8000";
-var debug = true;
+var API_KEY = "fjas";
+var API_BASE_URL = "mongo";
+var debug = false;
 
 // API module, has a private doRequest method, and public get and set methods
 api = (function () {
@@ -366,7 +366,7 @@ tools = (function () {
 
         // This method takes in an array of attendees and lists those whose attended flag is set to true,
         // as well as keeping track of the total amount of attendees.
-        populate_attendance_list: function (attendees) {
+        populate_attendance_list: function (attendees, ordering) {
             var ev = events.get_active_event();
             var list = $('#attendees');
             var registered = [];
@@ -376,8 +376,8 @@ tools = (function () {
 
             // Sorting function for attendee array by firstname
             var sort_by_name = function(a, b) {
-                var first = a.first_name.toLowerCase();
-                var second = b.first_name.toLowerCase();
+                var first = a.user.first_name.toLowerCase();
+                var second = b.user.first_name.toLowerCase();
                 if (first < second) return -1;
                 else if (first > second) return 1;
                 else return 0;
@@ -386,37 +386,52 @@ tools = (function () {
             // Seperate the boys from the men (split into registered, unregistered and waitlisted)
             for (var x = 0; x < attendees.length; x++) {
                 if (attendees[x].attended) {
-                    registered.push(attendees[x].user);
+                    registered.push(attendees[x]);
                 }
                 else if (ev.attendance_event.waitlist && (x+1) > ev.attendance_event.max_capacity) {
-                    waitlisted.push(attendees[x].user);
+                    waitlisted.push(attendees[x]);
                 }
                 else {
-                    unregistered.push(attendees[x].user);
+                    unregistered.push(attendees[x]);
                 }
             };
 
             // Sort the lists alfabetically
-            registered.sort(sort_by_name);
-            unregistered.sort(sort_by_name);
+            if (ordering) {
+                registered.sort(sort_by_name);
+                unregistered.sort(sort_by_name);
+            }
 
             // Build the list
-            tabledata += '<tr><th>Møtt</th></tr>';
+            tabledata += '<tr><th>Møtt';
+            tabledata += '<button class="btn btn-primary btn-small pull-right" id="order_attended">Sortér etter påmelding</button> ';
+            tabledata += '<button class="btn btn-primary btn-small pull-right" id="order_name">Sortér etter navn</button></th></tr>';
             $(registered).each(function (i) {
-                tabledata += '<tr><td>' + registered[i].first_name + ' ' + registered[i].last_name + '</td></tr>';
+                tabledata += '<tr><td>' + registered[i].user.first_name + ' ' + registered[i].user.last_name;
+                tabledata += '<span class="pull-right">' + new Date(registered[i].timestamp) + '</span></td></tr>';
             });
             tabledata += '<tr><th>Ikke møtt</th></tr>';
             $(unregistered).each(function (i) {
-                tabledata += '<tr><td>' + unregistered[i].first_name + ' ' + unregistered[i].last_name + '</td></tr>';
+                tabledata += '<tr><td>' + unregistered[i].user.first_name + ' ' + unregistered[i].user.last_name;
+                tabledata += '<span class="pull-right">' + new Date(unregistered[i].timestamp) + '</span></td></tr>';
             });
             tabledata += '<tr><th>Venteliste</th></tr>';
             $(waitlisted).each(function (i) {
-                tabledata += '<tr><td>' + (i + 1) + '. ' + waitlisted[i].first_name + ' ' + waitlisted[i].last_name + '</td></tr>';
+                tabledata += '<tr><td>' + (i + 1) + '. ' + waitlisted[i].user.first_name + ' ' + waitlisted[i].user.last_name;
+                tabledata += '<span class="pull-right">' + new Date(waitlisted[i].timestamp) + '</span></td></tr>';
             });
             list.html(tabledata);
 
             // Update stats
             $('#total_attendees').html('Møtt: ' + registered.length + ' &ndash; Påmeldte: ' + attendees.length+ ' &ndash; Plasser: ' + ev.attendance_event.max_capacity);
+            $('#order_attended').on('click', function (e) {
+                e.preventDefault();
+                tools.populate_attendance_list(events.get_active_event().attendance_event.users, false);
+            });
+            $('#order_name').on('click', function (e) {
+                e.preventDefault();
+                tools.populate_attendance_list(events.get_active_event().attendance_event.users, true);
+            });
         },
 
         // Get user by RFID
