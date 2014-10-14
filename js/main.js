@@ -1,8 +1,8 @@
 /* MODULES */
 
 var events, tools, api;
-var API_KEY = "fjas";
-var API_BASE_URL = "mongo";
+var API_KEY = "derp";
+var API_BASE_URL = "http://localhost";
 var debug = false;
 
 // API module, has a private doRequest method, and public get and set methods
@@ -581,6 +581,7 @@ $(document).ready(function () {
     $('#input').keypress(function (key) {
         if (key.which === 13) {
             var input = $('#input').val();
+            input = input.toLowerCase();
             tools.parse_input(input);
             tools.showwarning(200, "Sender forespørsel...");
         }
